@@ -3,114 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HUD - Heads Up Display</title>
+    <title>JARVIS HUD - Advanced Interface</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Star field background -->
-    <div class="starfield">
-        <div class="stars-layer stars-slow"></div>
-        <div class="stars-layer stars-medium"></div>
-        <div class="stars-layer stars-fast"></div>
+    <!-- Boot Sequence Overlay -->
+    <div class="boot-sequence" id="bootSequence">
+        <div class="boot-content">
+            <div class="boot-logo">
+                <div class="arc-reactor">
+                    <div class="reactor-core"></div>
+                    <div class="reactor-ring"></div>
+                    <div class="reactor-ring reactor-ring-2"></div>
+                    <div class="reactor-ring reactor-ring-3"></div>
+                </div>
+            </div>
+            <div class="boot-text">INITIALIZING JARVIS PROTOCOL</div>
+            <div class="boot-progress">
+                <div class="boot-bar" id="bootBar"></div>
+            </div>
+            <div class="boot-status" id="bootStatus">Loading Systems...</div>
+        </div>
     </div>
-    
-    <div class="hud-container">
-        <!-- Top Left Corner -->
-        <div class="corner top-left">
-            <div class="panel">
-                <div class="panel-header">NAVIGATION</div>
-                <div class="compass" id="compass">
-                    <div class="compass-needle"></div>
-                    <div class="compass-direction">N</div>
-                </div>
-                <div class="coordinates">
-                    <span class="label">LAT:</span> <span id="lat">00.0000°</span><br>
-                    <span class="label">LON:</span> <span id="lon">00.0000°</span>
-                </div>
-            </div>
+
+    <!-- Main HUD Container -->
+    <div class="hud-wrapper">
+        <!-- Animated Background -->
+        <div class="bg-layer">
+            <canvas id="particleCanvas"></canvas>
+            <div class="grid-lines"></div>
         </div>
 
-        <!-- Top Right Corner -->
-        <div class="corner top-right">
-            <div class="panel">
-                <div class="panel-header">RADAR</div>
-                <div class="radar">
-                    <div class="radar-scan"></div>
-                    <div class="radar-grid">
-                        <div class="grid-line horizontal"></div>
-                        <div class="grid-line vertical"></div>
-                    </div>
-                    <div class="radar-blips"></div>
-                    <div class="radar-center"></div>
-                </div>
-            </div>
+        <!-- Rotating Circles -->
+        <div class="hud-circles">
+            <div class="circle-ring circle-1"></div>
+            <div class="circle-ring circle-2"></div>
+            <div class="circle-ring circle-3"></div>
+            <div class="circle-segment segment-1"></div>
+            <div class="circle-segment segment-2"></div>
+            <div class="circle-segment segment-3"></div>
         </div>
 
-        <!-- Bottom Left Corner -->
-        <div class="corner bottom-left">
-            <div class="panel">
-                <div class="panel-header">SYSTEMS</div>
-                <div class="status-bars">
+        <!-- Top Section -->
+        <div class="hud-top">
+            <!-- Left: System Status -->
+            <div class="hud-panel panel-glass">
+                <div class="panel-header">
+                    <span class="header-icon">◆</span>
+                    SYSTEM STATUS
+                    <span class="status-indicator active"></span>
+                </div>
+                <div class="status-grid">
                     <div class="status-item">
-                        <span class="status-label">SHIELD</span>
-                        <div class="bar-container">
-                            <div class="bar shield-bar" id="shield-bar"></div>
+                        <div class="circular-progress" data-value="98">
+                            <svg class="progress-ring" width="80" height="80">
+                                <circle class="progress-ring-circle" stroke="#00f3ff" stroke-width="3" fill="transparent" r="35" cx="40" cy="40"/>
+                                <circle class="progress-ring-fill" stroke="#00f3ff" stroke-width="3" fill="transparent" r="35" cx="40" cy="40" id="progress-1"/>
+                            </svg>
+                            <div class="progress-value" id="power-percent">98%</div>
                         </div>
-                        <span class="status-value" id="shield-value">100%</span>
+                        <div class="status-label">POWER CORE</div>
                     </div>
                     <div class="status-item">
-                        <span class="status-label">POWER</span>
-                        <div class="bar-container">
-                            <div class="bar power-bar" id="power-bar"></div>
+                        <div class="circular-progress" data-value="100">
+                            <svg class="progress-ring" width="80" height="80">
+                                <circle class="progress-ring-circle" stroke="#0af" stroke-width="3" fill="transparent" r="35" cx="40" cy="40"/>
+                                <circle class="progress-ring-fill" stroke="#0af" stroke-width="3" fill="transparent" r="35" cx="40" cy="40" id="progress-2"/>
+                            </svg>
+                            <div class="progress-value" id="shield-percent">100%</div>
                         </div>
-                        <span class="status-value" id="power-value">100%</span>
+                        <div class="status-label">SHIELDS</div>
                     </div>
                     <div class="status-item">
-                        <span class="status-label">HULL</span>
-                        <div class="bar-container">
-                            <div class="bar hull-bar" id="hull-bar"></div>
+                        <div class="circular-progress" data-value="89">
+                            <svg class="progress-ring" width="80" height="80">
+                                <circle class="progress-ring-circle" stroke="#ff6b00" stroke-width="3" fill="transparent" r="35" cx="40" cy="40"/>
+                                <circle class="progress-ring-fill" stroke="#ff6b00" stroke-width="3" fill="transparent" r="35" cx="40" cy="40" id="progress-3"/>
+                            </svg>
+                            <div class="progress-value" id="weapon-percent">89%</div>
                         </div>
-                        <span class="status-value" id="hull-value">100%</span>
+                        <div class="status-label">WEAPONS</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Holographic Scan -->
+            <div class="hud-panel panel-glass">
+                <div class="panel-header">
+                    <span class="header-icon">◈</span>
+                    THREAT ANALYSIS
+                    <span class="status-indicator scanning"></span>
+                </div>
+                <div class="hologram-scan">
+                    <div class="scan-target">
+                        <div class="target-crosshair"></div>
+                        <div class="scan-line"></div>
+                        <div class="scan-corners">
+                            <div class="corner tl"></div>
+                            <div class="corner tr"></div>
+                            <div class="corner bl"></div>
+                            <div class="corner br"></div>
+                        </div>
+                        <div class="scan-data" id="scanData">
+                            <div class="scan-result">SCANNING TARGET...</div>
+                            <div class="scan-progress" id="scanProgress">0%</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Bottom Right Corner -->
-        <div class="corner bottom-right">
-            <div class="panel">
-                <div class="panel-header">TELEMETRY</div>
-                <div class="telemetry">
-                    <div class="metric">
-                        <div class="metric-label">ALTITUDE</div>
-                        <div class="metric-value" id="altitude">0</div>
-                        <div class="metric-unit">M</div>
+        <!-- Center Section -->
+        <div class="hud-center">
+            <!-- Main Targeting System -->
+            <div class="main-reticle">
+                <div class="reticle-outer"></div>
+                <div class="reticle-inner"></div>
+                <div class="reticle-lines">
+                    <div class="rline rline-h"></div>
+                    <div class="rline rline-v"></div>
+                </div>
+                <div class="reticle-brackets">
+                    <div class="bracket b-tl"></div>
+                    <div class="bracket b-tr"></div>
+                    <div class="bracket b-bl"></div>
+                    <div class="bracket b-br"></div>
+                </div>
+                <div class="target-lock-text" id="targetText">ACQUIRING TARGET</div>
+            </div>
+
+            <!-- Floating Hexagons -->
+            <div class="hex-field" id="hexField"></div>
+        </div>
+
+        <!-- Bottom Section -->
+        <div class="hud-bottom">
+            <!-- Left: Radar 3D -->
+            <div class="hud-panel panel-glass">
+                <div class="panel-header">
+                    <span class="header-icon">◉</span>
+                    3D RADAR
+                </div>
+                <div class="radar-3d">
+                    <div class="radar-grid-3d">
+                        <div class="radar-sweep"></div>
+                        <div class="radar-blip" style="--x: 30%; --y: 40%; --delay: 0s;"></div>
+                        <div class="radar-blip" style="--x: 60%; --y: 25%; --delay: 0.5s;"></div>
+                        <div class="radar-blip" style="--x: 45%; --y: 70%; --delay: 1s;"></div>
+                        <div class="radar-blip" style="--x: 75%; --y: 55%; --delay: 1.5s;"></div>
+                        <div class="radar-blip" style="--x: 20%; --y: 80%; --delay: 2s;"></div>
                     </div>
-                    <div class="metric">
-                        <div class="metric-label">SPEED</div>
-                        <div class="metric-value" id="speed">0</div>
-                        <div class="metric-unit">KM/H</div>
+                    <div class="radar-info">
+                        <div class="radar-stat">CONTACTS: <span class="highlight">5</span></div>
+                        <div class="radar-stat">RANGE: <span class="highlight">2.4 KM</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center: Flight Data -->
+            <div class="hud-panel panel-glass flight-data">
+                <div class="metric-large">
+                    <div class="metric-label">ALTITUDE</div>
+                    <div class="metric-value" id="altitude">08450</div>
+                    <div class="metric-unit">METERS</div>
+                </div>
+                <div class="metric-row">
+                    <div class="metric-small">
+                        <div class="metric-label-sm">VELOCITY</div>
+                        <div class="metric-value-sm" id="velocity">1247</div>
+                        <div class="metric-unit-sm">KM/H</div>
+                    </div>
+                    <div class="metric-small">
+                        <div class="metric-label-sm">HEADING</div>
+                        <div class="metric-value-sm" id="heading">085°</div>
+                        <div class="metric-unit-sm">NORTH</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: System Messages -->
+            <div class="hud-panel panel-glass">
+                <div class="panel-header">
+                    <span class="header-icon">⚠</span>
+                    NOTIFICATIONS
+                </div>
+                <div class="message-feed" id="messageFeed">
+                    <div class="message-item info">
+                        <span class="msg-time">12:34:56</span>
+                        <span class="msg-text">Systems online</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Center Crosshair -->
-        <div class="crosshair">
-            <div class="crosshair-h"></div>
-            <div class="crosshair-v"></div>
-            <div class="crosshair-circle"></div>
+        <!-- Decorative Elements -->
+        <div class="hud-decorations">
+            <div class="deco-corner deco-tl"></div>
+            <div class="deco-corner deco-tr"></div>
+            <div class="deco-corner deco-bl"></div>
+            <div class="deco-corner deco-br"></div>
+            <div class="deco-line line-top"></div>
+            <div class="deco-line line-bottom"></div>
         </div>
 
-        <!-- Center Bottom - Target Info -->
-        <div class="target-info">
-            <div class="target-lock" id="target-lock">
-                <span class="target-status">NO TARGET</span>
-            </div>
+        <!-- Pulse Waves -->
+        <div class="pulse-container">
+            <div class="pulse-wave"></div>
+            <div class="pulse-wave pulse-delay-1"></div>
+            <div class="pulse-wave pulse-delay-2"></div>
         </div>
     </div>
 
     <script src="script.js"></script>
 </body>
 </html>
-

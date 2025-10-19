@@ -1,245 +1,322 @@
-// Generate star field
-function generateStars() {
-    const layers = [
-        { selector: '.stars-slow', count: 100, size: 2 },
-        { selector: '.stars-medium', count: 80, size: 1.5 },
-        { selector: '.stars-fast', count: 60, size: 1 }
-    ];
+// ===== BOOT SEQUENCE =====
+let bootMessages = [
+    'Initializing core systems...',
+    'Loading neural network...',
+    'Calibrating sensors...',
+    'Establishing connections...',
+    'JARVIS online'
+];
+
+let bootIndex = 0;
+const bootInterval = setInterval(() => {
+    if (bootIndex < bootMessages.length) {
+        document.getElementById('bootStatus').textContent = bootMessages[bootIndex];
+        bootIndex++;
+    } else {
+        clearInterval(bootInterval);
+    }
+}, 800);
+
+// ===== PARTICLE CANVAS =====
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+class Particle {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 1;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.speedY = (Math.random() - 0.5) * 0.5;
+        this.opacity = Math.random() * 0.5 + 0.3;
+    }
     
-    layers.forEach(layer => {
-        const element = document.querySelector(layer.selector);
-        let starsHTML = '';
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
         
-        for (let i = 0; i < layer.count; i++) {
-            const x = Math.random() * 200; // 200% width
-            const y = Math.random() * 200; // 200% height
-            const size = Math.random() * layer.size + 0.5;
-            const opacity = Math.random() * 0.5 + 0.5;
-            const twinkle = Math.random() * 3;
-            
-            starsHTML += `
-                <div style="
-                    position: absolute;
-                    left: ${x}%;
-                    top: ${y}%;
-                    width: ${size}px;
-                    height: ${size}px;
-                    background: #fff;
-                    border-radius: 50%;
-                    box-shadow: 0 0 ${size * 2}px rgba(255, 255, 255, ${opacity});
-                    animation: twinkle ${twinkle}s ease-in-out infinite;
-                "></div>
-            `;
-        }
-        
-        element.innerHTML = starsHTML;
-    });
+        if (this.x > canvas.width) this.x = 0;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.y > canvas.height) this.y = 0;
+        if (this.y < 0) this.y = canvas.height;
+    }
+    
+    draw() {
+        ctx.fillStyle = `rgba(0, 243, 255, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
 }
 
-// Add twinkle animation
-const twinkleStyle = document.createElement('style');
-twinkleStyle.textContent = `
-    @keyframes twinkle {
-        0%, 100% { opacity: 0.3; }
-        50% { opacity: 1; }
+const particles = [];
+for (let i = 0; i < 100; i++) {
+    particles.push(new Particle());
+}
+
+function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    particles.forEach(particle => {
+        particle.update();
+        particle.draw();
+    });
+    
+    // Connect nearby particles
+    for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < 100) {
+                ctx.strokeStyle = `rgba(0, 243, 255, ${0.2 * (1 - distance / 100)})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.stroke();
+            }
+        }
     }
-`;
-document.head.appendChild(twinkleStyle);
+    
+    requestAnimationFrame(animateParticles);
+}
 
-// HUD Data Simulation System
+animateParticles();
 
+// ===== HEXAGON FIELD =====
+function generateHexagons() {
+    const hexField = document.getElementById('hexField');
+    for (let i = 0; i < 15; i++) {
+        const hex = document.createElement('div');
+        hex.className = 'hexagon';
+        hex.style.left = `${Math.random() * 100}%`;
+        hex.style.top = `${Math.random() * 100}%`;
+        hex.style.animationDelay = `${Math.random() * 3}s`;
+        hex.style.animationDuration = `${3 + Math.random() * 2}s`;
+        hexField.appendChild(hex);
+    }
+}
+
+generateHexagons();
+
+// ===== CIRCULAR PROGRESS =====
+function setProgress(elementId, percent) {
+    const circle = document.getElementById(elementId);
+    const radius = circle.r.baseVal.value;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - (percent / 100) * circumference;
+    circle.style.strokeDashoffset = offset;
+}
+
+// Initialize progress rings
+setTimeout(() => {
+    setProgress('progress-1', 98);
+    setProgress('progress-2', 100);
+    setProgress('progress-3', 89);
+}, 100);
+
+// ===== HUD SYSTEM DATA =====
 class HUDSystem {
     constructor() {
-        this.altitude = 0;
-        this.speed = 0;
-        this.latitude = 0;
-        this.longitude = 0;
-        this.heading = 0;
+        this.altitude = 8450;
+        this.velocity = 1247;
+        this.heading = 85;
         
-        this.shield = 100;
-        this.power = 100;
-        this.hull = 100;
+        this.powerCore = 98;
+        this.shields = 100;
+        this.weapons = 89;
+        
+        this.scanProgress = 0;
+        this.targetLocked = false;
+        
+        this.messages = [];
         
         this.init();
     }
     
     init() {
-        // Start all systems
-        this.updateTelemetry();
-        this.updateNavigation();
-        this.updateSystemStatus();
-        this.generateRadarBlips();
-        
-        // Update intervals
+        // Start system updates
         setInterval(() => this.updateTelemetry(), 100);
-        setInterval(() => this.updateNavigation(), 500);
-        setInterval(() => this.updateSystemStatus(), 2000);
-        setInterval(() => this.updateRadarBlips(), 3000);
+        setInterval(() => this.updateSystemStatus(), 3000);
+        setInterval(() => this.updateScan(), 2000);
+        setInterval(() => this.updateTarget(), 4000);
+        
+        // Add initial message
+        this.addMessage('Systems operational', 'info');
+        
+        setTimeout(() => {
+            this.addMessage('Radar online', 'info');
+        }, 2000);
+        
+        setTimeout(() => {
+            this.addMessage('Weapons armed', 'warning');
+        }, 4000);
     }
     
     updateTelemetry() {
         // Simulate altitude changes
-        this.altitude += (Math.random() - 0.5) * 50;
-        this.altitude = Math.max(0, Math.min(50000, this.altitude));
+        this.altitude += (Math.random() - 0.5) * 10;
+        this.altitude = Math.max(0, Math.min(15000, this.altitude));
         
-        // Simulate speed changes
-        this.speed += (Math.random() - 0.5) * 20;
-        this.speed = Math.max(0, Math.min(2000, this.speed));
+        // Simulate velocity changes
+        this.velocity += (Math.random() - 0.5) * 5;
+        this.velocity = Math.max(0, Math.min(2500, this.velocity));
         
-        // Update display
-        document.getElementById('altitude').textContent = Math.round(this.altitude).toString().padStart(5, '0');
-        document.getElementById('speed').textContent = Math.round(this.speed).toString().padStart(4, '0');
-    }
-    
-    updateNavigation() {
-        // Simulate coordinate changes
-        this.latitude += (Math.random() - 0.5) * 0.01;
-        this.longitude += (Math.random() - 0.5) * 0.01;
-        this.heading += (Math.random() - 0.5) * 10;
-        
-        // Normalize heading
-        this.heading = (this.heading + 360) % 360;
+        // Simulate heading changes
+        this.heading += (Math.random() - 0.5) * 2;
+        this.heading = ((this.heading % 360) + 360) % 360;
         
         // Update display
-        document.getElementById('lat').textContent = this.latitude.toFixed(4) + '°';
-        document.getElementById('lon').textContent = this.longitude.toFixed(4) + '°';
-        
-        // Update compass needle
-        const compass = document.querySelector('.compass-needle');
-        compass.style.setProperty('--rotation', `${this.heading}deg`);
+        document.getElementById('altitude').textContent = 
+            Math.round(this.altitude).toString().padStart(5, '0');
+        document.getElementById('velocity').textContent = 
+            Math.round(this.velocity).toString().padStart(4, '0');
+        document.getElementById('heading').textContent = 
+            Math.round(this.heading).toString().padStart(3, '0') + '°';
     }
     
     updateSystemStatus() {
-        // Simulate system drain and recharge
-        const drainShield = Math.random() > 0.5;
-        const drainPower = Math.random() > 0.6;
-        const drainHull = Math.random() > 0.8;
+        // Simulate system fluctuations
+        const rand = Math.random();
         
-        if (drainShield) {
-            this.shield = Math.max(0, this.shield - Math.random() * 30);
+        if (rand > 0.7) {
+            this.powerCore = Math.max(50, this.powerCore - Math.random() * 20);
         } else {
-            this.shield = Math.min(100, this.shield + Math.random() * 15);
+            this.powerCore = Math.min(100, this.powerCore + Math.random() * 10);
         }
         
-        if (drainPower) {
-            this.power = Math.max(0, this.power - Math.random() * 25);
+        if (rand > 0.8) {
+            this.shields = Math.max(0, this.shields - Math.random() * 30);
+            if (this.shields < 30) {
+                this.addMessage('SHIELDS CRITICAL!', 'danger');
+            }
         } else {
-            this.power = Math.min(100, this.power + Math.random() * 20);
+            this.shields = Math.min(100, this.shields + Math.random() * 15);
         }
         
-        if (drainHull) {
-            this.hull = Math.max(0, this.hull - Math.random() * 10);
+        if (rand > 0.85) {
+            this.weapons = Math.max(30, this.weapons - Math.random() * 15);
         } else {
-            this.hull = Math.min(100, this.hull + Math.random() * 5);
+            this.weapons = Math.min(100, this.weapons + Math.random() * 10);
         }
         
-        // Update bars
-        this.updateBar('shield', this.shield);
-        this.updateBar('power', this.power);
-        this.updateBar('hull', this.hull);
+        // Update progress rings
+        setProgress('progress-1', Math.round(this.powerCore));
+        setProgress('progress-2', Math.round(this.shields));
+        setProgress('progress-3', Math.round(this.weapons));
+        
+        // Update percentages
+        document.getElementById('power-percent').textContent = 
+            Math.round(this.powerCore) + '%';
+        document.getElementById('shield-percent').textContent = 
+            Math.round(this.shields) + '%';
+        document.getElementById('weapon-percent').textContent = 
+            Math.round(this.weapons) + '%';
     }
     
-    updateBar(type, value) {
-        const bar = document.getElementById(`${type}-bar`);
-        const valueDisplay = document.getElementById(`${type}-value`);
-        
-        bar.style.width = `${value}%`;
-        valueDisplay.textContent = `${Math.round(value)}%`;
-        
-        // Change color based on value
-        if (value < 30) {
-            bar.style.filter = 'hue-rotate(120deg)';
-            valueDisplay.style.color = '#ff4444';
-        } else if (value < 60) {
-            bar.style.filter = 'hue-rotate(60deg)';
-            valueDisplay.style.color = '#ffaa44';
-        } else {
-            bar.style.filter = 'hue-rotate(0deg)';
-            valueDisplay.style.color = '#0ff';
-        }
+    updateScan() {
+        this.scanProgress = 0;
+        const scanInterval = setInterval(() => {
+            this.scanProgress += 10;
+            document.getElementById('scanProgress').textContent = this.scanProgress + '%';
+            
+            if (this.scanProgress >= 100) {
+                clearInterval(scanInterval);
+                document.querySelector('.scan-result').textContent = 'SCAN COMPLETE';
+                
+                setTimeout(() => {
+                    document.querySelector('.scan-result').textContent = 'SCANNING TARGET...';
+                }, 1000);
+            }
+        }, 200);
     }
     
-    generateRadarBlips() {
-        const radarBlips = document.querySelector('.radar-blips');
-        radarBlips.innerHTML = '';
+    updateTarget() {
+        this.targetLocked = !this.targetLocked;
+        const targetText = document.getElementById('targetText');
         
-        // Generate 3-7 random blips
-        const blipCount = Math.floor(Math.random() * 5) + 3;
-        
-        for (let i = 0; i < blipCount; i++) {
-            const blip = document.createElement('div');
-            blip.className = 'radar-blip';
-            
-            // Random position within radar circle
-            const angle = Math.random() * Math.PI * 2;
-            const distance = Math.random() * 60 + 10; // 10-70px from center
-            
-            const x = 50 + Math.cos(angle) * distance;
-            const y = 50 + Math.sin(angle) * distance;
-            
-            blip.style.cssText = `
-                position: absolute;
-                left: ${x}%;
-                top: ${y}%;
-                width: 4px;
-                height: 4px;
-                background: #0ff;
-                border-radius: 50%;
-                transform: translate(-50%, -50%);
-                box-shadow: 0 0 8px #0ff;
-                animation: blipPulse 1.5s ease-in-out infinite;
-            `;
-            
-            // Random animation delay
-            blip.style.animationDelay = `${Math.random() * 1.5}s`;
-            
-            radarBlips.appendChild(blip);
+        if (this.targetLocked) {
+            targetText.textContent = 'TARGET LOCKED';
+            targetText.style.color = '#ff0040';
+            this.addMessage('Target acquired', 'warning');
+        } else {
+            targetText.textContent = 'ACQUIRING TARGET';
+            targetText.style.color = '#ffd700';
         }
     }
     
-    updateRadarBlips() {
-        this.generateRadarBlips();
+    addMessage(text, type = 'info') {
+        const messageFeed = document.getElementById('messageFeed');
+        const now = new Date();
+        const time = now.toTimeString().split(' ')[0];
+        
+        const message = document.createElement('div');
+        message.className = `message-item ${type}`;
+        message.innerHTML = `
+            <span class="msg-time">${time}</span>
+            <span class="msg-text">${text}</span>
+        `;
+        
+        messageFeed.insertBefore(message, messageFeed.firstChild);
+        
+        // Keep only last 5 messages
+        while (messageFeed.children.length > 5) {
+            messageFeed.removeChild(messageFeed.lastChild);
+        }
     }
 }
 
-// Add blip pulse animation
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes blipPulse {
-        0%, 100% {
-            opacity: 0.4;
-            transform: translate(-50%, -50%) scale(1);
-        }
-        50% {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1.5);
-        }
-    }
-`;
-document.head.appendChild(style);
-
-// Initialize star field
-generateStars();
-
-// Initialize HUD System
-const hud = new HUDSystem();
-
-// Target lock simulation
-let targetLocked = false;
-setInterval(() => {
-    targetLocked = !targetLocked;
-    const targetStatus = document.querySelector('.target-status');
+// ===== INITIALIZE SYSTEM =====
+setTimeout(() => {
+    const hud = new HUDSystem();
     
-    if (targetLocked) {
-        targetStatus.textContent = 'TARGET LOCKED';
-        targetStatus.style.color = '#f00';
-        document.querySelector('.target-lock').style.borderColor = '#f00';
-    } else {
-        targetStatus.textContent = 'SCANNING...';
-        targetStatus.style.color = '#0ff';
-        document.querySelector('.target-lock').style.borderColor = '#0ff';
+    // Random event messages
+    const events = [
+        { msg: 'Hostile detected', type: 'danger' },
+        { msg: 'Navigation updated', type: 'info' },
+        { msg: 'Power surge detected', type: 'warning' },
+        { msg: 'Shields recharging', type: 'info' },
+        { msg: 'Entering combat zone', type: 'warning' },
+        { msg: 'Enemy missile locked', type: 'danger' },
+        { msg: 'Countermeasures deployed', type: 'info' },
+        { msg: 'Hull integrity stable', type: 'info' },
+        { msg: 'Ammunition: 78%', type: 'info' },
+        { msg: 'Radar interference', type: 'warning' }
+    ];
+    
+    setInterval(() => {
+        const event = events[Math.floor(Math.random() * events.length)];
+        hud.addMessage(event.msg, event.type);
+    }, 8000);
+    
+}, 5500);
+
+// ===== RESIZE HANDLER =====
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+
+// ===== INTERACTIVE EFFECTS =====
+document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 20;
+    const y = (e.clientY / window.innerHeight - 0.5) * 20;
+    
+    // Parallax effect on circles
+    const circles = document.querySelector('.hud-circles');
+    if (circles) {
+        circles.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
     }
-}, 4000);
+});
 
-console.log('HUD System initialized successfully');
-
+// ===== CONSOLE EASTER EGG =====
+console.log('%c⚡ JARVIS PROTOCOL ACTIVATED ⚡', 
+    'color: #00f3ff; font-size: 20px; font-weight: bold; text-shadow: 0 0 10px #00f3ff;');
+console.log('%cWelcome to the HUD Interface System', 
+    'color: #0af; font-size: 14px;');
+console.log('%cAll systems operational', 
+    'color: #00ff88; font-size: 12px;');
