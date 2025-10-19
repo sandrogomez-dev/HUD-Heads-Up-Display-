@@ -1,0 +1,424 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background: #000;
+    overflow: hidden;
+    color: #0ff;
+}
+
+.hud-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #001a1a 0%, #000 100%);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0;
+    overflow: hidden;
+}
+
+/* Corner positioning */
+.corner {
+    position: absolute;
+    padding: 20px;
+    z-index: 10;
+}
+
+.top-left {
+    top: 0;
+    left: 0;
+}
+
+.top-right {
+    top: 0;
+    right: 0;
+}
+
+.bottom-left {
+    bottom: 0;
+    left: 0;
+}
+
+.bottom-right {
+    bottom: 0;
+    right: 0;
+}
+
+/* Panel styles */
+.panel {
+    background: rgba(0, 20, 20, 0.8);
+    border: 2px solid #0ff;
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+    min-width: 200px;
+    animation: panelGlow 2s ease-in-out infinite;
+}
+
+@keyframes panelGlow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3),
+                    inset 0 0 20px rgba(0, 255, 255, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.5),
+                    inset 0 0 30px rgba(0, 255, 255, 0.2);
+    }
+}
+
+.panel-header {
+    font-size: 14px;
+    font-weight: bold;
+    color: #0ff;
+    margin-bottom: 10px;
+    text-align: center;
+    letter-spacing: 2px;
+    border-bottom: 1px solid #0ff;
+    padding-bottom: 5px;
+}
+
+/* Compass */
+.compass {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #0ff;
+    border-radius: 50%;
+    position: relative;
+    margin: 10px auto;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+.compass-needle {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    width: 2px;
+    height: 40%;
+    background: #f00;
+    transform-origin: bottom center;
+    transform: translateX(-50%) rotate(var(--rotation, 0deg));
+    box-shadow: 0 0 10px #f00;
+    transition: transform 0.3s ease;
+}
+
+.compass-direction {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.coordinates {
+    font-size: 11px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.label {
+    color: #0aa;
+}
+
+/* Radar */
+.radar {
+    width: 150px;
+    height: 150px;
+    border: 2px solid #0ff;
+    border-radius: 50%;
+    position: relative;
+    margin: 10px auto;
+    overflow: hidden;
+    background: rgba(0, 30, 30, 0.5);
+}
+
+.radar-scan {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #0ff);
+    transform-origin: left center;
+    transform: translate(-50%, -50%) rotate(0deg);
+    animation: radarScan 3s linear infinite;
+}
+
+@keyframes radarScan {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+.radar-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.grid-line {
+    position: absolute;
+    background: rgba(0, 255, 255, 0.2);
+}
+
+.grid-line.horizontal {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    transform: translateY(-50%);
+}
+
+.grid-line.vertical {
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 100%;
+    transform: translateX(-50%);
+}
+
+.radar-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    background: #0ff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px #0ff;
+}
+
+.radar-blips {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Status Bars */
+.status-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+}
+
+.status-label {
+    width: 60px;
+    font-weight: bold;
+}
+
+.bar-container {
+    flex: 1;
+    height: 20px;
+    background: rgba(0, 50, 50, 0.5);
+    border: 1px solid #0ff;
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+}
+
+.bar {
+    height: 100%;
+    transition: width 0.3s ease;
+    position: relative;
+    animation: barPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes barPulse {
+    0%, 100% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.shield-bar {
+    background: linear-gradient(90deg, #0066ff, #00aaff);
+    box-shadow: 0 0 10px rgba(0, 170, 255, 0.8);
+}
+
+.power-bar {
+    background: linear-gradient(90deg, #00ff00, #88ff00);
+    box-shadow: 0 0 10px rgba(136, 255, 0, 0.8);
+}
+
+.hull-bar {
+    background: linear-gradient(90deg, #ff6600, #ffaa00);
+    box-shadow: 0 0 10px rgba(255, 170, 0, 0.8);
+}
+
+.status-value {
+    width: 40px;
+    text-align: right;
+    font-weight: bold;
+}
+
+/* Telemetry */
+.telemetry {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.metric {
+    text-align: center;
+}
+
+.metric-label {
+    font-size: 11px;
+    color: #0aa;
+    margin-bottom: 5px;
+}
+
+.metric-value {
+    font-size: 36px;
+    font-weight: bold;
+    color: #0ff;
+    text-shadow: 0 0 10px #0ff;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+}
+
+.metric-unit {
+    font-size: 12px;
+    color: #0aa;
+    margin-top: 2px;
+}
+
+/* Crosshair */
+.crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    z-index: 5;
+}
+
+.crosshair-h {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #0ff 40%, #0ff 60%, transparent);
+}
+
+.crosshair-v {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, #0ff 40%, #0ff 60%, transparent);
+}
+
+.crosshair-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 2px solid #0ff;
+    border-radius: 50%;
+    animation: crosshairPulse 2s ease-in-out infinite;
+}
+
+@keyframes crosshairPulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 1;
+    }
+}
+
+/* Target Info */
+.target-info {
+    position: absolute;
+    bottom: 40%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+}
+
+.target-lock {
+    padding: 10px 20px;
+    border: 2px solid #0ff;
+    background: rgba(0, 20, 20, 0.8);
+    border-radius: 5px;
+    text-align: center;
+    animation: targetBlink 1s ease-in-out infinite;
+}
+
+@keyframes targetBlink {
+    0%, 100% {
+        border-color: #0ff;
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+    50% {
+        border-color: #0aa;
+        box-shadow: 0 0 5px rgba(0, 170, 170, 0.3);
+    }
+}
+
+.target-status {
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+/* Scanline effect */
+.hud-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 255, 255, 0.03),
+        rgba(0, 255, 255, 0.03) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    animation: scanline 8s linear infinite;
+}
+
+@keyframes scanline {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(20px);
+    }
+}
+

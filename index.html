@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUD - Heads Up Display</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="hud-container">
+        <!-- Top Left Corner -->
+        <div class="corner top-left">
+            <div class="panel">
+                <div class="panel-header">NAVIGATION</div>
+                <div class="compass" id="compass">
+                    <div class="compass-needle"></div>
+                    <div class="compass-direction">N</div>
+                </div>
+                <div class="coordinates">
+                    <span class="label">LAT:</span> <span id="lat">00.0000°</span><br>
+                    <span class="label">LON:</span> <span id="lon">00.0000°</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Right Corner -->
+        <div class="corner top-right">
+            <div class="panel">
+                <div class="panel-header">RADAR</div>
+                <div class="radar">
+                    <div class="radar-scan"></div>
+                    <div class="radar-grid">
+                        <div class="grid-line horizontal"></div>
+                        <div class="grid-line vertical"></div>
+                    </div>
+                    <div class="radar-blips"></div>
+                    <div class="radar-center"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Left Corner -->
+        <div class="corner bottom-left">
+            <div class="panel">
+                <div class="panel-header">SYSTEMS</div>
+                <div class="status-bars">
+                    <div class="status-item">
+                        <span class="status-label">SHIELD</span>
+                        <div class="bar-container">
+                            <div class="bar shield-bar" id="shield-bar"></div>
+                        </div>
+                        <span class="status-value" id="shield-value">100%</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">POWER</span>
+                        <div class="bar-container">
+                            <div class="bar power-bar" id="power-bar"></div>
+                        </div>
+                        <span class="status-value" id="power-value">100%</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">HULL</span>
+                        <div class="bar-container">
+                            <div class="bar hull-bar" id="hull-bar"></div>
+                        </div>
+                        <span class="status-value" id="hull-value">100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Right Corner -->
+        <div class="corner bottom-right">
+            <div class="panel">
+                <div class="panel-header">TELEMETRY</div>
+                <div class="telemetry">
+                    <div class="metric">
+                        <div class="metric-label">ALTITUDE</div>
+                        <div class="metric-value" id="altitude">0</div>
+                        <div class="metric-unit">M</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">SPEED</div>
+                        <div class="metric-value" id="speed">0</div>
+                        <div class="metric-unit">KM/H</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Crosshair -->
+        <div class="crosshair">
+            <div class="crosshair-h"></div>
+            <div class="crosshair-v"></div>
+            <div class="crosshair-circle"></div>
+        </div>
+
+        <!-- Center Bottom - Target Info -->
+        <div class="target-info">
+            <div class="target-lock" id="target-lock">
+                <span class="target-status">NO TARGET</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
