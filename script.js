@@ -1,3 +1,51 @@
+// Generate star field
+function generateStars() {
+    const layers = [
+        { selector: '.stars-slow', count: 100, size: 2 },
+        { selector: '.stars-medium', count: 80, size: 1.5 },
+        { selector: '.stars-fast', count: 60, size: 1 }
+    ];
+    
+    layers.forEach(layer => {
+        const element = document.querySelector(layer.selector);
+        let starsHTML = '';
+        
+        for (let i = 0; i < layer.count; i++) {
+            const x = Math.random() * 200; // 200% width
+            const y = Math.random() * 200; // 200% height
+            const size = Math.random() * layer.size + 0.5;
+            const opacity = Math.random() * 0.5 + 0.5;
+            const twinkle = Math.random() * 3;
+            
+            starsHTML += `
+                <div style="
+                    position: absolute;
+                    left: ${x}%;
+                    top: ${y}%;
+                    width: ${size}px;
+                    height: ${size}px;
+                    background: #fff;
+                    border-radius: 50%;
+                    box-shadow: 0 0 ${size * 2}px rgba(255, 255, 255, ${opacity});
+                    animation: twinkle ${twinkle}s ease-in-out infinite;
+                "></div>
+            `;
+        }
+        
+        element.innerHTML = starsHTML;
+    });
+}
+
+// Add twinkle animation
+const twinkleStyle = document.createElement('style');
+twinkleStyle.textContent = `
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+    }
+`;
+document.head.appendChild(twinkleStyle);
+
 // HUD Data Simulation System
 
 class HUDSystem {
@@ -169,6 +217,9 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Initialize star field
+generateStars();
 
 // Initialize HUD System
 const hud = new HUDSystem();
